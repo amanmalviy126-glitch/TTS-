@@ -1,0 +1,6 @@
+{
+  "name": "Vocalize AI",
+  "description": "Modern Android Text-to-Speech application featuring 20+ American English regional accent voices, audio export (MP3/WAV), pitch & speed controls, and Material 3 design.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

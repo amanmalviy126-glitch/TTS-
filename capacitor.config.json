@@ -1,0 +1,15 @@
+{
+  "appId": "com.vocalize.ai.tts",
+  "appName": "Vocalize AI",
+  "webDir": "dist",
+  "bundledWebRuntime": false,
+  "server": {
+    "androidScheme": "https"
+  },
+  "plugins": {
+    "SplashScreen": {
+      "launchShowDuration": 2000,
+      "backgroundColor": "#0F172A"
+    }
+  }
+}
