@@ -15,3 +15,6 @@ dependencyResolutionManagement {
 
 rootProject.name = "Vocalize AI"
 include ':app'
+
+include ':capacitor-android'
+project(':capacitor-android').projectDir = new File('../node_modules/@capacitor/android/capacitor')
