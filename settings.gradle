@@ -5,15 +5,9 @@ pluginManagement {
         gradlePluginPortal()
     }
 }
-dependencyResolutionManagement {
-    repositoriesMode.set(RepositoriesMode.PREFER_PROJECT)
-    repositories {
-        google()
-        mavenCentral()
-    }
-}
 
 rootProject.name = "Vocalize AI"
 include ':app'
 
-apply from: 'android/capacitor.settings.gradle'
+apply from: 'capacitor.settings.gradle'
+
