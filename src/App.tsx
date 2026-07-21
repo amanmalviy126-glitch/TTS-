@@ -148,18 +148,175 @@ export default function App() {
   };
 
   return (
-  <div
-    style={{
-      color: "white",
-      background: "#111",
-      height: "100vh",
-      display: "flex",
-      justifyContent: "center",
-      alignItems: "center",
-      fontSize: 30,
-    }}
->
-  Vocalize AI Working
-</div>
-);
+    <div
+      className={`min-h-screen ${
+        darkMode ? 'dark bg-slate-950 text-slate-100' : 'bg-slate-100 text-slate-900'
+      } font-sans selection:bg-indigo-500 selection:text-white pb-24 transition-colors duration-200`}
+    >
+      {/* Top App Bar Header */}
+      <Header
+        darkMode={darkMode}
+        onToggleDarkMode={handleToggleDarkMode}
+        onOpenAndroidModal={() => setIsAndroidModalOpen(true)}
+      />
+
+      {/* Main Content Area */}
+      <main className="max-w-4xl mx-auto px-4 py-6 space-y-6">
+        {/* Tab 1: Speech Generation View */}
+        {activeTab === 'generate' && (
+          <div className="space-y-6 animate-in fade-in duration-200">
+            {/* Text Editor */}
+            <TextEditor
+              text={text}
+              onChangeText={setText}
+              onOpenSpellCheck={() => setIsSpellCheckOpen(true)}
+              speed={speed}
+            />
+
+            {/* Speech Controls */}
+            <SpeechControls
+              selectedVoice={selectedVoice}
+              speed={speed}
+              pitch={pitch}
+              volume={volume}
+              format={format}
+              isGenerating={isGenerating}
+              onChangeSpeed={setSpeed}
+              onChangePitch={setPitch}
+              onChangeVolume={setVolume}
+              onChangeFormat={setFormat}
+              onOpenVoiceLibrary={() => setActiveTab('voices')}
+              onGenerate={handleGenerateSpeech}
+              disabled={!text.trim()}
+            />
+
+            {/* Generated Audio Player Output */}
+            {currentAudio && (
+              <AudioPlayer
+                audioUrl={currentAudio.audioUrl}
+                blob={currentAudio.blob}
+                voice={selectedVoice}
+                format={format}
+                durationSeconds={currentAudio.durationSeconds}
+                source={currentAudio.source}
+                text={text}
+                onOpenShareModal={handleOpenShareModal}
+              />
+            )}
+          </div>
+        )}
+
+        {/* Tab 2: 20+ American Voices Library */}
+        {activeTab === 'voices' && (
+          <div className="animate-in fade-in duration-200">
+            <VoiceLibrary
+              selectedVoice={selectedVoice}
+              favoriteVoiceIds={favoriteVoiceIds}
+              onSelectVoice={(voice) => {
+                setSelectedVoice(voice);
+                setActiveTab('generate');
+              }}
+              onToggleFavorite={handleToggleFavorite}
+            />
+          </div>
+        )}
+
+        {/* Tab 3: History List */}
+        {activeTab === 'history' && (
+          <div className="animate-in fade-in duration-200">
+            <HistoryList
+              history={history}
+              onPlayItem={handlePlayHistoryItem}
+              onDeleteItem={handleDeleteHistoryItem}
+              onClearHistory={handleClearHistory}
+              onOpenShareModal={handleOpenShareModal}
+            />
+          </div>
+        )}
+
+        {/* Tab 4: Android APK Setup Guide */}
+        {activeTab === 'android' && (
+          <div className="bg-slate-900/80 rounded-3xl p-6 border border-slate-800 space-y-5 animate-in fade-in duration-200">
+            <div className="flex items-center gap-3 border-b border-slate-800 pb-4">
+              <div className="p-3 bg-emerald-500/20 text-emerald-400 rounded-2xl border border-emerald-500/30">
+                <Smartphone className="w-6 h-6" />
+              </div>
+              <div>
+                <h2 className="text-xl font-bold text-white">Vocalize AI Android Setup</h2>
+                <p className="text-xs text-slate-400">
+                  Ready for Android 10 to 16, GitHub, and Android Studio
+                </p>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="p-4 bg-slate-950 rounded-2xl border border-slate-800 space-y-2">
+                <div className="text-emerald-400 font-bold text-sm flex items-center gap-1.5">
+                  <CheckCircle className="w-4 h-4" /> 1-Tap PWA Install
+                </div>
+                <p className="text-xs text-slate-300">
+                  Tap Chrome menu (⋮) and select "Install app" or "Add to Home Screen" to run as an APK app.
+                </p>
+              </div>
+
+              <div className="p-4 bg-slate-950 rounded-2xl border border-slate-800 space-y-2">
+                <div className="text-indigo-400 font-bold text-sm flex items-center gap-1.5">
+                  <CheckCircle className="w-4 h-4" /> Capacitor Android
+                </div>
+                <p className="text-xs text-slate-300">
+                  Includes <code className="text-indigo-300">capacitor.config.json</code> &amp; <code className="text-indigo-300">AndroidManifest.xml</code>.
+                </p>
+              </div>
+
+              <div className="p-4 bg-slate-950 rounded-2xl border border-slate-800 space-y-2">
+                <div className="text-purple-400 font-bold text-sm flex items-center gap-1.5">
+                  <CheckCircle className="w-4 h-4" /> Flutter Source
+                </div>
+                <p className="text-xs text-slate-300">
+                  Includes <code className="text-purple-300">pubspec.yaml</code> and <code className="text-purple-300">lib/main.dart</code> for Flutter builds.
+                </p>
+              </div>
+            </div>
+
+            <div className="pt-2">
+              <button
+                onClick={() => setIsAndroidModalOpen(true)}
+                className="w-full py-3.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-sm rounded-2xl shadow-lg shadow-emerald-600/30 transition-all cursor-pointer"
+              >
+                Open Complete Android Installation &amp; Build Guide
+              </button>
+            </div>
+          </div>
+        )}
+      </main>
+
+      {/* Bottom Navigation Bar */}
+      <BottomNav
+        activeTab={activeTab}
+        onTabChange={setActiveTab}
+        historyCount={history.length}
+      />
+
+      {/* Modals */}
+      <SpellCheckModal
+        isOpen={isSpellCheckOpen}
+        text={text}
+        onClose={() => setIsSpellCheckOpen(false)}
+        onApplyCorrection={(corrected) => setText(corrected)}
+      />
+
+      <ShareModal
+        isOpen={isShareModalOpen}
+        audioUrl={shareData.audioUrl}
+        blob={shareData.blob}
+        text={shareData.text}
+        onClose={() => setIsShareModalOpen(false)}
+      />
+
+      <AndroidExportModal
+        isOpen={isAndroidModalOpen}
+        onClose={() => setIsAndroidModalOpen(false)}
+      />
+    </div>
+  );
 }
