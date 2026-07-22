@@ -52,7 +52,8 @@ app.post('/api/tts/generate', async (req, res) => {
 
     // Call Gemini TTS model
     const response = await ai.models.generateContent({
-      model:'gemini-2.5-flash-preview-tts',             contents: [{ parts: [{ text: promptText }] }],
+      model:'gemini-2.5-flash-preview-tts',
+contents: [{ parts: [{ text: promptText }] }],
       config: {
         responseModalities: [Modality.AUDIO],
         speechConfig: {
