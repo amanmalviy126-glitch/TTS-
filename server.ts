@@ -1,21 +1,10 @@
 import express from 'express';
-import cors from 'cors';
 import path from 'path';
 import { GoogleGenAI, Modality } from '@google/genai';
 import { createServer as createViteServer } from 'vite';
 
 const app = express();
 const PORT = process.env.PORT || 3000;
-
-// CORS
-app.use(cors({
-  origin: '*',
-  methods: ['GET', 'POST', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization'],
-}));
-
-app.options('*', cors());
-
 app.use(express.json({ limit: '10mb' }));
 
 // Initialize Gemini AI SDK
