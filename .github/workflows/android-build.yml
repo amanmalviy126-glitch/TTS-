@@ -33,6 +33,8 @@ jobs:
           node-version: '22'
 
       - name: Install Frontend Dependencies, Build Web Bundle & Sync Capacitor
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
         run: |
           if [ -f package-lock.json ]; then
             npm ci || npm install
