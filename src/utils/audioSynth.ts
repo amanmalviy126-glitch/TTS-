@@ -68,75 +68,105 @@ export async function generateSpeechAudio(options: SpeechGenerateOptions): Promi
   const { text, voice, speed, pitch, volume, format } = options;
 
   try {
-    const response = await fetch("https://vocalize-ai-backend.onrender.com/api/tts/generate", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        text,
-        voiceId: voice.id,
-        voiceName: voice.name,
-        accent: voice.accent,
-        gender: voice.gender,
-        geminiVoice: voice.geminiVoice,
-        speed,
-        pitch,
-        volume,
-        format,
-      }),
-    });
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 30000);
 
-    if (!response.ok) {
-      const errorText = await response.text();
-      alert(`Server Error ${response.status}\n${errorText}`);
-      throw new Error(errorText);
-    }
+  let response: Response;
 
-    const data = await response.json();
-
-    if (!data.audioBase64) {
-      throw new Error("No audio returned from server");
-    }
-
-    let blob: Blob;
-
-    if (data.isPcm) {
-      blob = pcmBase64ToWavBlob(
-        data.audioBase64,
-        data.sampleRate || 24000
-      );
-    } else {
-      const binary = window.atob(data.audioBase64);
-      const bytes = new Uint8Array(binary.length);
-
-      for (let i = 0; i < binary.length; i++) {
-        bytes[i] = binary.charCodeAt(i);
+  try {
+    response = await fetch(
+      "https://vocalize-ai-backend.onrender.com/api/tts/generate",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Accept": "application/json",
+        },
+        signal: controller.signal,
+        body: JSON.stringify({
+          text,
+          voiceId: voice.id,
+          voiceName: voice.name,
+          accent: voice.accent,
+          gender: voice.gender,
+          geminiVoice: voice.geminiVoice,
+          speed,
+          pitch,
+          volume,
+          format,
+        }),
       }
+    );
+  } catch (e: any) {
+    clearTimeout(timeout);
 
-      blob = new Blob([bytes], {
-        type: format === "mp3" ? "audio/mp3" : "audio/wav",
-      });
-    }
-
-    return {
-      audioUrl: URL.createObjectURL(blob),
-      blob,
-      durationSeconds:
-        data.durationSeconds ||
-        Math.max(1, Math.round((text.length / 15) / speed)),
-      source: "ai",
-    };
-
-  } catch (err) {
-    console.error("TTS ERROR:", err);
     alert(
-      "TTS Error:\n" +
-      (err instanceof Error ? err.message : JSON.stringify(err))
+      "FETCH FAILED\n\n" +
+      "Name: " + (e?.name || "Unknown") +
+      "\nMessage: " + (e?.message || "No message") +
+      "\nStack:\n" + (e?.stack || "No stack")
     );
 
-    return Promise.reject(err);
+    throw e;
   }
+
+  clearTimeout(timeout);
+
+  if (!response.ok) {
+    const errorText = await response.text();
+
+    alert(`SERVER ERROR\n\nStatus: ${response.status}\n\n${errorText}`);
+
+    throw new Error(errorText);
+  }
+
+  const data = await response.json();
+
+  if (!data.audioBase64) {
+    throw new Error("No audio returned from server");
+  }
+
+  let blob: Blob;
+
+  if (data.isPcm) {
+    blob = pcmBase64ToWavBlob(
+      data.audioBase64,
+      data.sampleRate || 24000
+    );
+  } else {
+    const binary = window.atob(data.audioBase64);
+    const bytes = new Uint8Array(binary.length);
+
+    for (let i = 0; i < binary.length; i++) {
+      bytes[i] = binary.charCodeAt(i);
+    }
+
+    blob = new Blob([bytes], {
+      type: format === "mp3" ? "audio/mp3" : "audio/wav",
+    });
+  }
+
+  return {
+    audioUrl: URL.createObjectURL(blob),
+    blob,
+    durationSeconds:
+      data.durationSeconds ||
+      Math.max(1, Math.round((text.length / 15) / speed)),
+    source: "ai",
+  };
+
+} catch (err: any) {
+  console.error("TTS ERROR:", err);
+
+  alert(
+    "FINAL ERROR\n\n" +
+    "Name: " + (err?.name || "Unknown") +
+    "\nMessage: " + (err?.message || "No message") +
+    "\nStack:\n" + (err?.stack || "No stack")
+  );
+
+  return Promise.reject(err);
+}
 }
 
 /**
