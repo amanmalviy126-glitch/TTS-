@@ -70,7 +70,7 @@ export async function generateSpeechAudio(options: SpeechGenerateOptions): Promi
 
   try {
     // 1. Attempt high quality server-side Gemini AI generation
-    const response = await fetch('/api/tts/generate', {
+    const response = await fetch('https://vocalize-ai-backend.onrender.com/api/tts/generate', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
