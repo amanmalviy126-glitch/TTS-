@@ -8,7 +8,18 @@ pluginManagement {
 
 rootProject.name = "Vocalize AI"
 include ':app'
-project(':app').projectDir = new File('android/app')
+project(':app').projectDir = new File(rootDir, 'android/app')
 
 apply from: 'android/capacitor.settings.gradle'
+
+rootProject.children.each { p ->
+    if (p.name == 'capacitor-android') {
+        p.projectDir = new File(rootDir, 'node_modules/@capacitor/android/capacitor')
+    } else if (p.name != 'app') {
+        def pluginDir = new File(rootDir, "node_modules/${p.name.replace('capacitor-', '@capacitor/')}")
+        if (pluginDir.exists()) {
+            p.projectDir = pluginDir
+        }
+    }
+}
 

@@ -49,6 +49,7 @@ jobs:
 
       - name: Generate Wrapper & Build Debug APK
         run: |
+          cd android
           gradle wrapper --gradle-version 8.5
           chmod +x gradlew
           ./gradlew assembleDebug --stacktrace
