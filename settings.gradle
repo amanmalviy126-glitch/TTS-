@@ -8,6 +8,7 @@ pluginManagement {
 
 rootProject.name = "Vocalize AI"
 include ':app'
+project(':app').projectDir = new File('android/app')
 
-apply from: 'capacitor.settings.gradle'
+apply from: 'android/capacitor.settings.gradle'
 
